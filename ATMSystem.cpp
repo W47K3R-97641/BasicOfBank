@@ -365,6 +365,7 @@ void ShowNormalWithdrawScreen()
 }
 void ShowDepositScreen()
 {
+    system("cls");
     cout << "===========================================\n";
     cout << "\t\tDeposit Screen\n";
     cout << "===========================================\n";
