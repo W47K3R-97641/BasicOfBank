@@ -26,8 +26,7 @@ sClient CurrentClient;
 const string ClientsFileName = "Clients.txt";
 
 enum enMainMenueOptions {eQuickWithdraw = 1, eNormalWithdraw = 2, eDeposit = 3, eCheckBalance = 4, eLogout = 5};
-enum enQuickWithdraw {FirstAmount = 1, SecondAmount, ThirdAmount, FourthAmount,
-FifthAmount, SixthAmount, SeventhAmount, EighthAmount};
+
 
 vector<string> SplitString(string S1, string Delim)
 {
@@ -209,7 +208,7 @@ short ReadQuickWithdrawOption()
         if (ReadFaild)
             cout << "\nOption Not Exist :( !!.\n";
         
-        cout << "Choose what to Withdraw From [1] to [8] ? ";
+        cout << "Choose what You Want To Do From [1] to [8] ? ";
         cin >> Choice;
         
         ReadFaild = Choice < 1 || Choice > 9;
@@ -235,7 +234,6 @@ bool DepositBalanceToClientByAccountNumber(string AccountNumber, double Amount)
                 C.AccountBalance += Amount;
                 SaveCleintsDataToFile(ClientsFileName, vClients);
                 cout << "\n\nDone Successfully. New balance is: " << C.AccountBalance;
-                CurrentClient = C;
                 return true;
             }
 
@@ -248,47 +246,32 @@ bool DepositBalanceToClientByAccountNumber(string AccountNumber, double Amount)
 }
 void Withdraw(double Amount)
 {
-    if (Amount > CurrentClient.AccountBalance)
-    {
-        cout << "\nAmount Exceeds Your balance, Make Another Choice : \n";
-        return;
-    }
-
     DepositBalanceToClientByAccountNumber(CurrentClient.AccountNumber, Amount * -1);
+    CurrentClient.AccountBalance -= Amount;
 }
-void PerfromQuickWithdraw(enQuickWithdraw Option)
+short GetQuickWithdrawAmount(short QuickWithdrawOption)
 {
-    short Amount = 0;
-    switch (Option)
+
+    switch (QuickWithdrawOption)
     {
-    case enQuickWithdraw::FirstAmount:
-        Amount = 20;
-        break;
-    case enQuickWithdraw::SecondAmount:
-        Amount = 50;
-        break;
-    case enQuickWithdraw::ThirdAmount:
-        Amount = 100;
-        break;
-    case enQuickWithdraw::FourthAmount:
-        Amount = 200;
-        break;
-    case enQuickWithdraw::FifthAmount:
-        Amount = 400;
-        break;
-    case enQuickWithdraw::SixthAmount:
-        Amount = 600;
-        break;
-    case enQuickWithdraw::SeventhAmount:
-        Amount = 800;
-        break;
-    case enQuickWithdraw::EighthAmount:
-        Amount = 1000;
-        break;
-    default:
-        ShowMainMenue();
-        return;
+    case 1 : return 20;
+    case 2 : return 50;
+    case 3 : return 100;
+    case 4 : return 200;
+    case 5 : return 400;
+    case 6 : return 600;
+    case 7 : return 800;
+    case 8 : return 1000;
+    default: return 0;
     }
+}
+void PerfromQuickWithdraw(short QuickWithdrawOption)
+{
+    if (QuickWithdrawOption == 9)
+        return;
+
+    short Amount = GetQuickWithdrawAmount(QuickWithdrawOption);
+    
 
     if (Amount > CurrentClient.AccountBalance)
     {
@@ -342,7 +325,7 @@ void ShowQuickWithdrawScreen()
     cout << "\t[1]20$\t[2]50$\n\t[3]100$\t[4]200$\n\t[5]400$\t[6]600$\n\t[7]800$\t[8]1000\t\n\t[9]Exit\n";
     cout << "===========================================\n";
 
-    PerfromQuickWithdraw((enQuickWithdraw)ReadQuickWithdrawOption());
+    PerfromQuickWithdraw(ReadQuickWithdrawOption());
 }
 void ShowNormalWithdrawScreen()
 {
@@ -360,8 +343,11 @@ void ShowNormalWithdrawScreen()
         system("pause>0");
         ShowNormalWithdrawScreen();
     }
+    else
+    {
+        Withdraw(Amount);
+    }
 
-    Withdraw(Amount);
 }
 void ShowDepositScreen()
 {
@@ -372,6 +358,7 @@ void ShowDepositScreen()
     double Amount = ReadDepositAmount("Enter A Positive Deposit Amount : ");
 
     DepositBalanceToClientByAccountNumber(CurrentClient.AccountNumber, Amount);
+    CurrentClient.AccountBalance += Amount;
 }
 void ShowCheckBalanceScreen()
 {
